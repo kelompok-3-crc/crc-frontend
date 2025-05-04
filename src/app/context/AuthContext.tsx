@@ -34,7 +34,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Add cookie options configuration
 const cookieOptions = {
   expires: 7, // 7 days
-  secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+  secure: false, // HTTP only
   sameSite: 'strict' as const,
   path: '/'
 };
