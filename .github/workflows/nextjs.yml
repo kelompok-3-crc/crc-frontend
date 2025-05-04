@@ -41,7 +41,7 @@ jobs:
       - name: Deploy to production directory
         run: |
           sudo rm -rf /var/www/frontend/*
-          sudo cp -r .next public package.json /var/www/frontend/
+          sudo cp -r .next public package.json next.config.ts postcss.config.mjs src /var/www/frontend/
           cd /var/www/frontend
           sudo ${{ steps.detect-package-manager.outputs.manager }} install --omit=dev
 

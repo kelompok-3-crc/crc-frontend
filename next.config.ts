@@ -1,7 +1,6 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["localhost"],
+    domains: ["localhost","192.168.23.62"],
   },
   webpack: (config: any) => {
     config.infrastructureLogging = {
@@ -10,3 +9,5 @@ const nextConfig = {
     return config;
   },
 };
+
+export default nextConfig;
