@@ -149,15 +149,17 @@ export default function DetailCustomer() {
               <h2 className="text-2xl font-bold mb-4">Produk Rekomendasi</h2>
               {customerData?.produk ? (
                 customerData.produk
+                  // First filter: remove products that customer already has and products with zero plafond
                   .filter(product => 
                     !customerData.produk_eksisting
                       ?.map(p => p.toLowerCase())
-                      ?.includes(product.prediksi.toLowerCase())
+                      ?.includes(product.prediksi.toLowerCase()) && 
+                    product.plafon_max > 0
                   ).length === 0 ? (
-                  // Show message when customer has all products
+                  // Show message when no products to recommend
                   <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
                     <p className="text-gray-600 text-lg">
-                      Nasabah sudah memiliki semua produk
+                      Tidak ada rekomendasi produk yang tersedia
                     </p>
                   </div>
                 ) : (
@@ -167,7 +169,8 @@ export default function DetailCustomer() {
                       .filter(product => 
                         !customerData.produk_eksisting
                           ?.map(p => p.toLowerCase())
-                          ?.includes(product.prediksi.toLowerCase())
+                          ?.includes(product.prediksi.toLowerCase()) &&
+                        product.plafon_max > 0
                       )
                       .map((product, index) => (
                         <CardReccomendation

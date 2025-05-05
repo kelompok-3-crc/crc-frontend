@@ -110,7 +110,7 @@ const CustomerInfoForm: React.FC = () => {
       const token = Cookies.get("token");
 
       const apiPayload = {
-        transaction_activity: formData.transactionActivity, // Convert to lowercase
+        transaction_activity: formData.transactionActivity,
         cif: formData.cif,
         nomor_rekening: formData.accountNumber,
         gender: formData.gender,
@@ -156,9 +156,12 @@ const CustomerInfoForm: React.FC = () => {
       }
 
       if (data.success) {
+        setShowVerifyPopup(false);
         setShowSavePopup(true);
+        // Add delay before redirect to show the success popup
         setTimeout(() => {
-          router.push("/dashboard/marketing");
+          // Redirect to customer detail page with the CIF
+          router.push(`/dashboard/marketing/customer/${formData.cif}`);
         }, 2000);
       } else {
         throw new Error(data.message || "Failed to submit");

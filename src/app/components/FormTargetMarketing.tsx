@@ -23,6 +23,22 @@ interface MarketingStaff {
     target_details: Product[];
 }
 
+interface BranchProduct {
+    product_id: number;
+    product_name: string;
+    total_target: number;
+    assigned_amount: number;
+    unassigned_amount: number;
+}
+
+interface BranchTarget {
+    branch_id: number;
+    branch_name: string;
+    month: number;
+    year: number;
+    products: BranchProduct[];
+}
+
 const FormTargetMarketing: React.FC = () => {
     const { user } = useAuth();
     const [marketingStaff, setMarketingStaff] = useState<MarketingStaff[]>([]);
@@ -36,6 +52,7 @@ const FormTargetMarketing: React.FC = () => {
     const [showVerifyPopup, setShowVerifyPopup] = useState<boolean>(false);
     const [showSavePopup, setShowSavePopup] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [branchTarget, setBranchTarget] = useState<BranchTarget | null>(null);
 
     // Format angka ke format mata uang
     const formatCurrency = (amount: number): string => {
@@ -100,6 +117,33 @@ const FormTargetMarketing: React.FC = () => {
 
         fetchMarketingTargets();
     }, [user?.target_month, user?.target_year]);
+
+    // Fetch branch targets
+    useEffect(() => {
+        const fetchBranchTargets = async () => {
+            try {
+                const token = Cookies.get("token");
+                const response = await fetch(`${API_BASE_URL}/bm/branch-targets`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch branch targets");
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    setBranchTarget(data.data);
+                }
+            } catch (error) {
+                console.error("Error fetching branch targets:", error);
+            }
+        };
+
+        fetchBranchTargets();
+    }, []);
 
     // Handle marketing selection
     const handleMarketingChange = (staff: MarketingStaff): void => {
@@ -210,7 +254,7 @@ const FormTargetMarketing: React.FC = () => {
                     <div className="flex">
                         <div className="flex-shrink-0">
                             <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 101.414 1.414L10 11.414l1.293 1.293a1 1 001.414-1.414L11.414 10l1.293-1.293a1 1 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                             </svg>
                         </div>
                         <div className="ml-3">
@@ -284,44 +328,61 @@ const FormTargetMarketing: React.FC = () => {
                         <h2 className="text-lg font-medium mb-4">
                             Target Setiap Produk
                         </h2>
-                        {products.map((product, index) => (
-                            <div
-                                key={product.product_id}
-                                className="flex items-center justify-between p-4 border border-slate-200 rounded-lg mb-3"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 flex items-center justify-center">
-                                        <Image
-                                            src={`/${product.product_name
-                                                .toLowerCase()
-                                                .replace(/\s+/g, "")}.png`}
-                                            alt={`${product.product_name} Icon`}
-                                            width={40}
-                                            height={40}
-                                            className="object-contain"
-                                        />
-                                    </div>
-                                    <span className="text-lg">
-                                        {product.product_name}
-                                    </span>
-                                </div>
+                        {products.map((product, index) => {
+                            const branchProduct = branchTarget?.products.find(
+                                (bp) => bp.product_id === product.product_id
+                            );
+                            
+                            return (
+                                <div
+                                    key={product.product_id}
+                                    className="flex flex-col p-4 border border-slate-200 rounded-lg mb-3"
+                                >
+                                    {/* Unassigned Amount Display */}
+                                    {branchProduct && (
+                                        <div className="text-sm text-gray-600 mb-2 text-right">
+                                            Sisa Target: {formatCurrency(branchProduct.unassigned_amount)}
+                                        </div>
+                                    )
+                                    }
+                                    
+                                    {/* Product Input */}
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 flex items-center justify-center">
+                                                <Image
+                                                    src={`/${product.product_name
+                                                        .toLowerCase()
+                                                        .replace(/\s+/g, "")}.png`}
+                                                    alt={`${product.product_name} Icon`}
+                                                    width={40}
+                                                    height={40}
+                                                    className="object-contain"
+                                                />
+                                            </div>
+                                            <span className="text-lg">
+                                                {product.product_name}
+                                            </span>
+                                        </div>
 
-                                <div className="flex items-center">
-                                    <span className="text-sm mr-2">Target</span>
-                                    <input
-                                        type="text"
-                                        value={formatCurrency(product.amount)}
-                                        onChange={(e) =>
-                                            handleProductTargetChange(
-                                                index,
-                                                e.target.value
-                                            )
-                                        }
-                                        className="p-2 border border-slate-300 rounded-md w-56"
-                                    />
+                                        <div className="flex items-center">
+                                            <span className="text-sm mr-2">Target</span>
+                                            <input
+                                                type="text"
+                                                value={formatCurrency(product.amount)}
+                                                onChange={(e) =>
+                                                    handleProductTargetChange(
+                                                        index,
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className="p-2 border border-slate-300 rounded-md w-56"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
 
                     {/* Total Target Display */}
