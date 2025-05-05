@@ -44,6 +44,9 @@ interface CustomerData {
     ikon: string;
     prediksi: string;
     plafon_max: number;  // Add this field
+    plafon_min: number;  // Add this field
+    tenor_min: number;   // Add this field
+    tenor_max: number;   // Add this field
     order: number;
   }>;
   closed_produk_id: number;
@@ -172,22 +175,29 @@ export default function DetailCustomer() {
                           ?.includes(product.prediksi.toLowerCase()) &&
                         product.plafon_max > 0
                       )
-                      .map((product, index) => (
-                        <CardReccomendation
-                          key={product.id}
-                          logo={`/${product.ikon}.png`}
-                          nomor={index + 1}
-                          produk={product.nama}
-                          maksimalPlafond={new Intl.NumberFormat('id-ID', {
+                      .map((product, index) => {
+                        const formatNumber = (num: number) => 
+                          new Intl.NumberFormat('id-ID', {
                             minimumFractionDigits: 0,
                             maximumFractionDigits: 0
-                          }).format(product.plafon_max)
-                            .replace(/\./g, ',')}
-                          onLihatPersyaratan={() =>
-                            console.log(`Lihat persyaratan ${product.nama} diklik`)
-                          }
-                        />
-                      ))}
+                          }).format(num).replace(/\./g, ',');
+
+                        return (
+                          <CardReccomendation
+                            key={product.id}
+                            logo={`/${product.ikon}.png`}
+                            nomor={index + 1}
+                            produk={product.nama}
+                            maksimalPlafond={formatNumber(product.plafon_max)}
+                            minimalPlafond={formatNumber(product.plafon_min)}
+                            tenorMin={product.tenor_min}
+                            tenorMax={product.tenor_max}
+                            onLihatPersyaratan={() =>
+                              console.log(`Lihat persyaratan ${product.nama} diklik`)
+                            }
+                          />
+                        );
+                      })}
                   </div>
                 )
               ) : (

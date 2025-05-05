@@ -6,6 +6,9 @@ interface CardReccomendationProps {
   nomor: number;
   produk: string;
   maksimalPlafond: string;
+  minimalPlafond: string;
+  tenorMin: number;
+  tenorMax: number;
   logo: string;
   onLihatPersyaratan?: () => void;
 }
@@ -14,20 +17,20 @@ const CardReccomendation: React.FC<CardReccomendationProps> = ({
   nomor,
   produk,
   maksimalPlafond,
+  minimalPlafond,
+  tenorMin,
+  tenorMax,
   logo,
 }) => {
-  // Tambahkan state untuk mengontrol popup
   const [showTnC, setShowTnC] = useState(false);
 
   return (
     <>
       <div className="w-full rounded-2xl border border-teal-500 p-4 flex flex-col">
-        {/* Judul */}
         <h2 className="text-lg font-semibold mb-4">
           Rekomendasi {nomor}
         </h2>
 
-        {/* Informasi Produk dan Plafond + Logo */}
         <div className="flex items-center gap-4 mb-4">
           <div className="w-14 h-14 relative">
             <Image
@@ -38,15 +41,21 @@ const CardReccomendation: React.FC<CardReccomendationProps> = ({
               className="object-contain"
             />
           </div>
-          <div>
+          <div className="flex-1">
             <h3 className="text-base font-semibold">{produk}</h3>
-            <p className="text-sm text-gray-700 font-medium">
-              Maksimal Plafond Rp. {maksimalPlafond}
-            </p>
+            <div className="space-y-1">
+              <p className="text-sm text-gray-700">
+                Plafond: Rp {minimalPlafond} - Rp {maksimalPlafond}
+              </p>
+              {(tenorMin > 0 || tenorMax > 0) && (
+                <p className="text-sm text-gray-700">
+                  Tenor: {tenorMin} - {tenorMax} bulan
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Modifikasi tombol untuk membuka popup */}
         <div className="flex justify-end mt-auto">
           <button
             onClick={() => setShowTnC(true)}
@@ -57,7 +66,6 @@ const CardReccomendation: React.FC<CardReccomendationProps> = ({
         </div>
       </div>
 
-      {/* Tambahkan TnC Popup */}
       <TnCPopup 
         isOpen={showTnC} 
         onClose={() => setShowTnC(false)} 
