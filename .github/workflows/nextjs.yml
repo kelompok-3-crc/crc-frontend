@@ -36,14 +36,35 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.install-cmd }}
 
       - name: Build Next.js project
-        run: NEXT_DISABLE_ESLINT=true ${{ steps.detect-package-manager.outputs.run-cmd }} next build
+        run: NEXT_PUBLIC_API_URL=http://192.168.23.62:8080/api/v1 NEXT_DISABLE_ESLINT=true ${{ steps.detect-package-manager.outputs.run-cmd }} next build
 
       - name: Deploy to production directory
         run: |
           sudo rm -rf /var/www/frontend/*
-          sudo cp -r .next public package.json /var/www/frontend/
+          sudo cp -r .next public package.json next.config.ts postcss.config.mjs src /var/www/frontend/
           cd /var/www/frontend
           sudo ${{ steps.detect-package-manager.outputs.manager }} install --omit=dev
+
+      - name: Create PM2 ecosystem config
+        run: |
+          echo '// Configuration created by mfachryna on 2025-05-04 15:26:23
+          module.exports = {
+            apps: [{
+              name: "frontend",
+              script: "npm",
+              args: "start",
+              cwd: "/var/www/frontend",
+              env: {
+                NODE_ENV: "production",
+                NEXT_PUBLIC_API_URL: "http://192.168.23.62:8080/api/v1"
+              },
+              instances: 1,
+              autorestart: true,
+              watch: false,
+              max_memory_restart: "1G",
+              time: true
+            }]
+          }' | sudo tee /var/www/frontend/ecosystem.config.js > /dev/null
 
       - name: Install PM2 globally
         run: sudo npm install -g pm2
@@ -56,7 +77,7 @@ jobs:
             pm2 restart frontend
           else
             echo "🚀 Starting new frontend process..."
-            pm2 start ${{ steps.detect-package-manager.outputs.manager }} --name "frontend" -- start
+            pm2 start ecosystem.config.js
           fi
 
       - name: Deployment success
