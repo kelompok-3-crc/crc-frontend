@@ -147,41 +147,50 @@ export default function DetailCustomer() {
 
             <div className="mt-8">
               <h2 className="text-2xl font-bold mb-4">Produk Rekomendasi</h2>
-              {customerData.produk
-                .filter(product => !customerData.produk_eksisting
-                  .map(p => p.toLowerCase())
-                  .includes(product.prediksi.toLowerCase())
-                ).length === 0 ? (
-                // Show message when customer has all products
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-                  <p className="text-gray-600 text-lg">
-                    Nasabah sudah memiliki semua produk
-                  </p>
-                </div>
+              {customerData?.produk ? (
+                customerData.produk
+                  .filter(product => 
+                    !customerData.produk_eksisting
+                      ?.map(p => p.toLowerCase())
+                      ?.includes(product.prediksi.toLowerCase())
+                  ).length === 0 ? (
+                  // Show message when customer has all products
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                    <p className="text-gray-600 text-lg">
+                      Nasabah sudah memiliki semua produk
+                    </p>
+                  </div>
+                ) : (
+                  // Show product recommendations grid
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {customerData.produk
+                      .filter(product => 
+                        !customerData.produk_eksisting
+                          ?.map(p => p.toLowerCase())
+                          ?.includes(product.prediksi.toLowerCase())
+                      )
+                      .map((product, index) => (
+                        <CardReccomendation
+                          key={product.id}
+                          logo={`/${product.ikon}.png`}
+                          nomor={index + 1}
+                          produk={product.nama}
+                          maksimalPlafond={new Intl.NumberFormat('id-ID', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                          }).format(product.plafon_max)
+                            .replace(/\./g, ',')}
+                          onLihatPersyaratan={() =>
+                            console.log(`Lihat persyaratan ${product.nama} diklik`)
+                          }
+                        />
+                      ))}
+                  </div>
+                )
               ) : (
-                // Show product recommendations grid
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {customerData.produk
-                    .filter(product => !customerData.produk_eksisting
-                      .map(p => p.toLowerCase())
-                      .includes(product.prediksi.toLowerCase())
-                    )
-                    .map((product, index) => (
-                      <CardReccomendation
-                        key={product.id}
-                        logo={`/${product.ikon}.png`}
-                        nomor={index + 1}
-                        produk={product.nama}
-                        maksimalPlafond={new Intl.NumberFormat('id-ID', {
-                          minimumFractionDigits: 0,
-                          maximumFractionDigits: 0
-                        }).format(product.plafon_max)
-                          .replace(/\./g, ',')}
-                        onLihatPersyaratan={() =>
-                          console.log(`Lihat persyaratan ${product.nama} diklik`)
-                        }
-                      />
-                    ))}
+                // Show loading state when produk data is not available
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                  <p className="text-gray-600 text-lg">Loading product recommendations...</p>
                 </div>
               )}
             </div>

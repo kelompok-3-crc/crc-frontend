@@ -6,7 +6,7 @@ import SavePopUp from "./SavePopUp";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { API_BASE_URL } from '@/app/constants/config';
-
+import toast from "react-hot-toast";
 
 interface FormData {
   cif: string;
@@ -59,6 +59,9 @@ const CustomerInfoForm: React.FC = () => {
   const [showVerifyPopup, setShowVerifyPopup] = useState(false);
   const [showSavePopup, setShowSavePopup] = useState(false);
 
+  // Add state for field errors
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ): void => {
@@ -103,6 +106,7 @@ const CustomerInfoForm: React.FC = () => {
 
   const handleVerifyConfirm = async () => {
     try {
+      setFieldErrors({}); // Clear previous errors
       const token = Cookies.get("token");
 
       const apiPayload = {
@@ -139,7 +143,15 @@ const CustomerInfoForm: React.FC = () => {
       });
 
       const data = await response.json();
+
       if (!response.ok) {
+        if (data.errors) {
+          setFieldErrors(data.errors);
+          if (data.message === "Kesalahan Validasi")
+            toast.error("Form belum diisi dengan benar");
+          return;
+        }
+        toast.error(data.message || "Failed to submit");
         throw new Error(data.message || "Failed to submit");
       }
 
@@ -153,7 +165,6 @@ const CustomerInfoForm: React.FC = () => {
       }
     } catch (error) {
       console.error("Error submitting form:", error);
-      alert(error instanceof Error ? error.message : "Failed to submit data");
       setShowVerifyPopup(false);
     }
   };
@@ -225,8 +236,15 @@ const CustomerInfoForm: React.FC = () => {
               name="cif"
               value={formData.cif}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              className={`w-full px-4 py-2 rounded-lg border ${
+                fieldErrors.cif ? 'border-red-500' : 'border-gray-300'
+              } focus:outline-none focus:ring-1 ${
+                fieldErrors.cif ? 'focus:ring-red-500' : 'focus:ring-teal-500'
+              }`}
             />
+            {fieldErrors.cif && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.cif}</p>
+            )}
           </div>
 
           {/* Nama Lengkap */}
@@ -243,8 +261,15 @@ const CustomerInfoForm: React.FC = () => {
               name="fullName"
               value={formData.fullName}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              className={`w-full px-4 py-2 rounded-lg border ${
+                fieldErrors.name ? 'border-red-500' : 'border-gray-300'
+              } focus:outline-none focus:ring-1 ${
+                fieldErrors.name ? 'focus:ring-red-500' : 'focus:ring-teal-500'
+              }`}
             />
+            {fieldErrors.name && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.name}</p>
+            )}
           </div>
 
           {/* No Telephone */}
@@ -291,8 +316,15 @@ const CustomerInfoForm: React.FC = () => {
               name="accountNumber"
               value={formData.accountNumber}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              className={`w-full px-4 py-2 rounded-lg border ${
+                fieldErrors.nomor_rekening ? 'border-red-500' : 'border-gray-300'
+              } focus:outline-none focus:ring-1 ${
+                fieldErrors.nomor_rekening ? 'focus:ring-red-500' : 'focus:ring-teal-500'
+              }`}
             />
+            {fieldErrors.nomor_rekening && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.nomor_rekening}</p>
+            )}
           </div>
 
           {/* Email */}
@@ -309,8 +341,15 @@ const CustomerInfoForm: React.FC = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              className={`w-full px-4 py-2 rounded-lg border ${
+                fieldErrors.email ? 'border-red-500' : 'border-gray-300'
+              } focus:outline-none focus:ring-1 ${
+                fieldErrors.email ? 'focus:ring-red-500' : 'focus:ring-teal-500'
+              }`}
             />
+            {fieldErrors.email && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.email}</p>
+            )}
           </div>
 
           {/* Alamat */}
@@ -327,8 +366,15 @@ const CustomerInfoForm: React.FC = () => {
               name="address"
               value={formData.address}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              className={`w-full px-4 py-2 rounded-lg border ${
+                fieldErrors.address ? 'border-red-500' : 'border-gray-300'
+              } focus:outline-none focus:ring-1 ${
+                fieldErrors.address ? 'focus:ring-red-500' : 'focus:ring-teal-500'
+              }`}
             />
+            {fieldErrors.address && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.address}</p>
+            )}
           </div>
 
           {/* Gender (Dropdown) */}
@@ -449,8 +495,15 @@ const CustomerInfoForm: React.FC = () => {
               name="company_name"
               value={formData.company_name}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              className={`w-full px-4 py-2 rounded-lg border ${
+                fieldErrors.company_name ? 'border-red-500' : 'border-gray-300'
+              } focus:outline-none focus:ring-1 ${
+                fieldErrors.company_name ? 'focus:ring-red-500' : 'focus:ring-teal-500'
+              }`}
             />
+            {fieldErrors.company_name && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.company_name}</p>
+            )}
           </div>
           <div>
             <label
@@ -465,8 +518,15 @@ const CustomerInfoForm: React.FC = () => {
               name="occupation"
               value={formData.occupation}
               onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              className={`w-full px-4 py-2 rounded-lg border ${
+                fieldErrors.occupation ? 'border-red-500' : 'border-gray-300'
+              } focus:outline-none focus:ring-1 ${
+                fieldErrors.occupation ? 'focus:ring-red-500' : 'focus:ring-teal-500'
+              }`}
             />
+            {fieldErrors.occupation && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.occupation}</p>
+            )}
           </div>
 
           {/* Age (Numeric) */}
@@ -483,9 +543,15 @@ const CustomerInfoForm: React.FC = () => {
               name="age"
               value={formData.age}
               onChange={handleChange}
-              min="0"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              className={`w-full px-4 py-2 rounded-lg border ${
+                fieldErrors.umur ? 'border-red-500' : 'border-gray-300'
+              } focus:outline-none focus:ring-1 ${
+                fieldErrors.umur ? 'focus:ring-red-500' : 'focus:ring-teal-500'
+              }`}
             />
+            {fieldErrors.umur && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.umur}</p>
+            )}
           </div>
 
           {/* Income (Numeric with formatting) */}
@@ -506,8 +572,15 @@ const CustomerInfoForm: React.FC = () => {
                   parseInt(e.target.value.replace(/\D/g, ""), 10) || 0;
                 setFormData((prev) => ({ ...prev, income: numericValue }));
               }}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              className={`w-full px-4 py-2 rounded-lg border ${
+                fieldErrors.income ? 'border-red-500' : 'border-gray-300'
+              } focus:outline-none focus:ring-1 ${
+                fieldErrors.income ? 'focus:ring-red-500' : 'focus:ring-teal-500'
+              }`}
             />
+            {fieldErrors.income && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.income}</p>
+            )}
           </div>
 
           {/* Marital Status (Boolean Buttons) */}
