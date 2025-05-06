@@ -100,35 +100,14 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  className="form-checkbox text-teal-600"
-                />
-                <span className="text-sm text-gray-600">Remember Me</span>
-              </label>
-              <Link href="#" className="text-sm text-teal-600 hover:underline">
-                Forgot Password
-              </Link>
-            </div>
-
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-teal-600 text-white py-2 px-4 rounded-md hover:bg-teal-700 transition disabled:opacity-50"
+              className="w-full bg-teal-600 text-white py-2 px-4 rounded-md hover:bg-teal-700 transition disabled:opacity-50 mt-4"
             >
               {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
 
-            <div className="text-center text-gray-500 text-sm">or</div>
-
-            <div className="text-center text-sm text-gray-700">
-              Don’t have an account?{" "}
-              <Link href="#" className="text-teal-600 hover:underline">
-                Register Now
-              </Link>
-            </div>
           </form>
         </div>
 
