@@ -131,7 +131,7 @@ export default function DashboardManager() {
 
   const getProductIcon = (productName: string): string => {
     const productIcons: Record<string, string> = {
-      'Mitraguna': '/mitraguna.png',
+      'Mitraguna Berkah': '/mitraguna.png',
       'Griya': '/griya.png',
       'Pensiun': '/pensiun.png',
       'Prapensiun': '/prapensiun.png',
